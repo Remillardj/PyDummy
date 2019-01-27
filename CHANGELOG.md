@@ -1,4 +1,8 @@
 # Changelog
+# 0.0.2
+- added some functional argument parsing, loosely using functional
+- started framework to convert outputs of functions into SQL INSERT formats
+- I think I was able to get it to work, we will see in the next update
 
 # 0.0.1
 - initial bare-minimum functionality

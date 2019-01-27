@@ -63,6 +63,7 @@ def get_manufactorers(fileName="manufactorers.txt"):
 		return False
 
 # Use a configuration file to retrieve vehicle model years randomly
+# Yes I know it's not actually an API, but I plan to eventually implement one for the MySQL database
 def vehicle_model_year_api(iniFile="../private/db.ini"):
 	config = configparser.ConfigParser()
 	config.read(iniFile)

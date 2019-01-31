@@ -7,6 +7,8 @@ import sqlite3
 import pymysql
 import configparser
 
+from dummy.VinGenerator import vin
+
 # Fake license plate  generator
 def license_plates(size=6, chars=string.ascii_uppercase + string.digits):
 	return (''.join(random.choice(chars) for _ in range(size)))
@@ -90,3 +92,7 @@ def vehicle_model_year(host, password, db, port=3306, user="root"):
 	except Exception as e:
 		print(e)
 		return 0
+
+# Generate a random vin
+def vin_generator():
+	return vin.getRandomVin()

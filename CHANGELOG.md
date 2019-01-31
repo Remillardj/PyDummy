@@ -1,4 +1,10 @@
 # Changelog
+# 0.0.3
+- Now able to generate insert statements by arguments parsed through the terminal
+- Implemented yanigisawa Python Vin Generator into the program (https://github.com/yanigisawa/VinGenerator)
+- Updated yanigisawa VinGenerator to be Python 3 compatible
+- Able to generate random vin's
+
 # 0.0.2
 - added some functional argument parsing, loosely using functional
 - started framework to convert outputs of functions into SQL INSERT formats

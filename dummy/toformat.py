@@ -1,43 +1,61 @@
 #!/usr/local/bin/python3
 
-def write_to_file(data = [], filename="data.sql"):
-    with open(filename, "a") as file:
-        for insert in data:
-            file.write(insert)
+# Verify the length of each element in a 2D array
+def verify_array(row):
+    len00 = len(row[0])
+    i = 0
+    len0 = len(row)
+    while (i < len0):
+        leni = len(row[i])
+        if (leni != len00):
+            print("Index %d does not match Index 0" % i)
+            return False
+        return True
 
-def sql_delete_query(table, column, pk):
+# Write to a file
+def write_to_file(data = [], statement=False, filename="insert.sql"):
+    if (statement):
+        with open(filename, "a") as file:
+            file.write(statement)
+    else:
+        with open(filename, "a") as file:
+            for insert in data:
+                file.write(insert + "\n")
+
+def sql_delete_query(table, column, pk, filename="delete.sql"):
     return ("DELETE FROM `" + table + "` WHERE " + column + "=" + pk + ";")
 
 def sql_insert_query(table, columns=[], values=[]):
     insertQuery = []
-    numCol = len(columns)
-    numValues = len(values)
+    numCol = len(columns) #3
+    numValues = len(values) #3
     if (numValues < numCol):
-        print ("Why is there more values than columns? Returning this you silly goose.")
+        print ("Why is there more values than columns? Returning false you silly goose.")
         return False
-    x = 0
-    while (x < numValues):
+    
+    if (verify_array(values)):
+        # Length of row already verified
+        len00 = len(values[0]) #5
         i = 0
-        insert = "INSERT INTO `" + table + "` ("
-        for v in columns:
-            insert += "`" + v + "`, "
-        insert += ") VALUES ("
-        while (i < numCol):
-            for _ in range(numCol):
-                insert += "`" + values[x] + "`, "
-                x += 1
-                i += 1
-        insert += ");"
-        insertQuery.append(insert)
-    write_to_file(insertQuery)
+        while (i < len00):
+            insert = "INSERT INTO `" + table + "` ("
+            for col in columns[:-1]:
+                insert += "`" + col + "`, "
+            insert += "`" + columns[-1] + "`"
+            insert += ") VALUES ("
+            c = 0
+            while (c < numValues):
+                if ( c == (numValues-1)):
+                    insert += "`" + values[c][i] + "`"
+                    break
+                insert += "`" + values[c][i] + "`, "
+                c += 1
+            insert += ");"
+            insertQuery.append(insert)
+            i += 1
+        write_to_file(insertQuery)
 
-# Create insert statements by default
-def to_sql(output, delete=False):
-    if (delete):
-        pass
-    else:
-        pass
-
+# Eventually...
 def to_json(output, delete=False):
     if (delete):
         pass

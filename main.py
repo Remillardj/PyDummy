@@ -3,17 +3,18 @@
 import argparse
 import random
 from dummy import dummy
+from dummy import toformat
 
 def welcome():
 	print("""\
-		  _____                                    _____        _           _____                           _             
-		 |  __ \                                  |  __ \      | |         / ____|                         | |            
-		 | |  | |_   _ _ __ ___  _ __ ___  _   _  | |  | | __ _| |_ __ _  | |  __  ___ _ __   ___ _ __ __ _| |_ ___  _ __ 
-		 | |  | | | | | '_ ` _ \| '_ ` _ \| | | | | |  | |/ _` | __/ _` | | | |_ |/ _ \ '_ \ / _ \ '__/ _` | __/ _ \| '__|
-		 | |__| | |_| | | | | | | | | | | | |_| | | |__| | (_| | || (_| | | |__| |  __/ | | |  __/ | | (_| | || (_) | |   
-		 |_____/ \__,_|_| |_| |_|_| |_| |_|\__, | |_____/ \__,_|\__\__,_|  \_____|\___|_| |_|\___|_|  \__,_|\__\___/|_|   
-		                                    __/ |                                                                         
-		                                   |___/                                                                          
+
+		____ ___  _ ____  _     _      _     ___  _   _____ _____ _      _____ ____  ____  _____  ____  ____ 
+		/  __\\  \///  _ \/ \ /\/ \__/|/ \__/|\  \//  /  __//  __// \  /|/  __//  __\/  _ \/__ __\/  _ \/  __\
+		|  \/| \  / | | \|| | ||| |\/||| |\/|| \  /   | |  _|  \  | |\ |||  \  |  \/|| / \|  / \  | / \||  \/|
+		|  __/ / /  | |_/|| \_/|| |  ||| |  || / /    | |_//|  /_ | | \|||  /_ |    /| |-||  | |  | \_/||    /
+		\_/   /_/   \____/\____/\_/  \|\_/  \|/_/     \____\\____\\_/  \|\____\\_/\_\\_/ \|  \_/  \____/\_/\_\
+																											
+								
 	""")
 	print("--- Starting PyDummy Data Generator! ---")
 
@@ -27,14 +28,15 @@ def lookup_table(number):
 		4 : "last_name",
 		5 : "email",
 		6 : "get_manufactorer",
-		7 : "vehicle_model_year"
+		7 : "vehicle_model_year",
+		8 : "vin_generator"
 	}
 	try:
 		return(d[number])
 	except KeyError:
 		return False
 
-def main(count, limbo = []):
+def generate_data(count, limbo = []):
 	output = {}
 	gender = ['male', 'female']
 	for value in limbo:
@@ -78,12 +80,22 @@ def main(count, limbo = []):
 			for _ in range(count):
 				tmp.append(dummy.vehicle_model_year_api())
 			output['vehicle_model_year'] = tmp
+		if (lookup_table(value) == "vin_generator"):
+			tmp = []
+			for _ in range(count):
+				tmp.append(dummy.vin_generator())
+			output['vin_generator'] = tmp
 	return output
 
 if (__name__ == "__main__"):
 	parser = argparse.ArgumentParser(description="Arguments for PyDummy Data Generator", allow_abbrev=True)
 	parser.add_argument("--version", action="version", version="PyDummy 0.0.2")
 	parser.add_argument("-c", "--count", help="Number of times to generate dummy data", default=1, type=int)
+	parser.add_argument("-i", "--insert", help="Create insert statements", default=True, action="store_true")
+	parser.add_argument("-d", "--delete", help="Create delete statements", default=False)
+	parser.add_argument("--column", help="Designated column to delete", type=str)
+	parser.add_argument("--pk", help="Designated Primary Key to use to delete via WHERE clause")
+	parser.add_argument("-t", "--table", help="Name of table to insert or delete from", default="pydummy")
 	#parser.add_argument("-f", "--file-type", help="File type to generate", default="sql", action="store_true")
 	parser.add_argument("--license-plate", help="Generate a license plate", default=False, action="store_true", dest="license")
 	parser.add_argument("--phone-number", help="Generate a phone number", default=False, action="store_true", dest="phone")
@@ -93,6 +105,7 @@ if (__name__ == "__main__"):
 	parser.add_argument("--email", help="Generate an email", default=False, action="store_true", dest="email")
 	parser.add_argument("--get-manufactorer", help="Generate a manufactorer", default=False, action="store_true", dest="manufactor")
 	parser.add_argument("--vehicle-model-year", help="Generate a vehicle, model, and year", default=False, action="store_true", dest="vmy")
+	parser.add_argument("--vin-generator", help="Generate a random fake VIN", default=False, action="store_true", dest="vin")
 	args = parser.parse_args()
 
 	# Handle arguments
@@ -114,6 +127,15 @@ if (__name__ == "__main__"):
 		limbo.append(6)
 	if (args.vmy):
 		limbo.append(7)
+	if (args.vin):
+		limbo.append(8)
 
 	# Generate dat data
-	main(count, limbo)
+	output = generate_data(count, limbo)
+	if (args.insert):
+		toformat.sql_insert_query(args.table, list(output.keys()), list(output.values()))
+	elif (args.delete and args.column and args.pk):
+		for _ in range(count):
+			toformat.sql_delete_query(args.table, args.column, args.pk)
+	else:
+		print("Please enter some arguments")

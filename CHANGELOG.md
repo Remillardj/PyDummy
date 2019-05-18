@@ -1,4 +1,7 @@
 # Changelog
+# 0.0.4
+- Generating insert statements now uses threading
+
 # 0.0.3
 - Now able to generate insert statements by arguments parsed through the terminal
 - Implemented yanigisawa Python Vin Generator into the program (https://github.com/yanigisawa/VinGenerator)

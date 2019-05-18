@@ -2,6 +2,11 @@
 
 import argparse
 import random
+import multiprocessing
+from threading import Thread
+import os
+import time
+
 from dummy import dummy
 from dummy import toformat
 
@@ -17,6 +22,7 @@ def welcome():
 								
 	""")
 	print("--- Starting PyDummy Data Generator! ---")
+
 
 # Lookup table for the appropriate function to run
 def lookup_table(number):
@@ -87,9 +93,55 @@ def generate_data(count, limbo = []):
 			output['vin_generator'] = tmp
 	return output
 
+'''
+ Refactored function of generate_date() to allow a more threading friendly function
+ Parameters:
+ 	count -> int: number of times to generate the data
+ 	value -> int: the data type to generate, uses the lookup table
+'''
+def generate_data_threading(count, value):
+	gender = ['male', 'female']
+	tmp = []
+	if (lookup_table(value) == "license_plate"):
+		for _ in range(count):
+			tmp.append(dummy.license_plates())
+		output['license_plates'] = tmp
+	if (lookup_table(value) == "phone_number"):
+		for _ in range(count):
+			tmp.append(dummy.phone_number())
+		output['phone_number'] = tmp
+	if (lookup_table(value) == "full_name"):
+		for _ in range(count):
+			tmp.append(dummy.full_name(random.choice(gender)))
+		output['full_name'] = tmp
+	if (lookup_table(value) == "first_name"):
+		for _ in range(count):
+			tmp.append(dummy.first_name(random.choice(gender)))
+		output['first_name'] = tmp
+	if (lookup_table(value) == "last_name"):
+		for _ in range(count):
+			tmp.append(dummy.last_name())
+		output['last_name'] = tmp
+	if (lookup_table(value) == "email"):
+		for _ in range(count):
+			tmp.append(dummy.generate_email())
+		output['email'] = tmp
+	if (lookup_table(value) == "get_manufactorer"):
+		for _ in range(count):
+			tmp.append(dummy.get_manufactorers())
+		output['get_manufactorer'] = tmp
+	if (lookup_table(value) == "vehicle_model_year_api"):
+		for _ in range(count):
+			tmp.append(dummy.vehicle_model_year_api())
+		output['vehicle_model_year'] = tmp
+	if (lookup_table(value) == "vin_generator"):
+		for _ in range(count):
+			tmp.append(dummy.vin_generator())
+		output['vin_generator'] = tmp
+
 if (__name__ == "__main__"):
 	parser = argparse.ArgumentParser(description="Arguments for PyDummy Data Generator", allow_abbrev=True)
-	parser.add_argument("--version", action="version", version="PyDummy 0.0.2")
+	parser.add_argument("--version", action="version", version="PyDummy 0.0.4")
 	parser.add_argument("-c", "--count", help="Number of times to generate dummy data", default=1, type=int)
 	parser.add_argument("-i", "--insert", help="Create insert statements", default=True, action="store_true")
 	parser.add_argument("-d", "--delete", help="Create delete statements", default=False)
@@ -103,8 +155,8 @@ if (__name__ == "__main__"):
 	parser.add_argument("--first-name", help="Generate a first name", default=False, action="store_true", dest="first")
 	parser.add_argument("--last-name", help="Generate a last name", default=False, action="store_true", dest="last")
 	parser.add_argument("--email", help="Generate an email", default=False, action="store_true", dest="email")
-	parser.add_argument("--get-manufactorer", help="Generate a manufactorer", default=False, action="store_true", dest="manufactor")
-	parser.add_argument("--vehicle-model-year", help="Generate a vehicle, model, and year", default=False, action="store_true", dest="vmy")
+	#parser.add_argument("--get-manufactorer", help="Generate a manufactorer", default=False, action="store_true", dest="manufactor")
+	#parser.add_argument("--vehicle-model-year", help="Generate a vehicle, model, and year", default=False, action="store_true", dest="vmy")
 	parser.add_argument("--vin-generator", help="Generate a random fake VIN", default=False, action="store_true", dest="vin")
 	args = parser.parse_args()
 
@@ -123,19 +175,31 @@ if (__name__ == "__main__"):
 		limbo.append(4)
 	if (args.email):
 		limbo.append(5)
-	if (args.manufactor):
-		limbo.append(6)
-	if (args.vmy):
-		limbo.append(7)
+	# TODO: currently there is a bug with both these options, will fix later
+	#if (args.manufactor):
+		#limbo.append(6)
+	#if (args.vmy):
+		#limbo.append(7)
 	if (args.vin):
 		limbo.append(8)
 
-	# Generate dat data
-	output = generate_data(count, limbo)
 	if (args.insert):
+		output = {}
+		threads = []
+		for value in limbo:
+			threads.append(Thread(target=generate_data_threading, args=(count, value)))
+
+		for thread in threads:
+			thread.start()
+
+		for thread in threads:
+			thread.join()
+
 		toformat.sql_insert_query(args.table, list(output.keys()), list(output.values()))
 	elif (args.delete and args.column and args.pk):
 		for _ in range(count):
 			toformat.sql_delete_query(args.table, args.column, args.pk)
 	else:
-		print("Please enter some arguments")
+		print("Please enter arguments")
+		exit(1)
+

@@ -25,10 +25,15 @@ def write_to_file(data = [], statement=False, filename="insert.sql"):
 def sql_delete_query(table, column, pk, filename="delete.sql"):
     return ("DELETE FROM `" + table + "` WHERE " + column + "=" + pk + ";")
 
+def sql_insert_query_multiprocessing(table, columns, values):
+    insertQuery = []
+    print (columns)
+    print (len(values))
+
 def sql_insert_query(table, columns=[], values=[]):
     insertQuery = []
-    numCol = len(columns) #3
-    numValues = len(values) #3
+    numCol = len(columns)
+    numValues = len(values)
     if (numValues < numCol):
         print ("Why is there more values than columns? Returning false you silly goose.")
         return False

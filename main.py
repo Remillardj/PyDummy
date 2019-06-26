@@ -34,64 +34,81 @@ def lookup_table(number):
 		4 : "last_name",
 		5 : "email",
 		6 : "get_manufactorer",
-		7 : "vehicle_model_year",
-		8 : "vin_generator"
+		7 : "vehicle_model_year_api",
+		8 : "vin_generator",
+		9 : "address",
+		10 : "text"
 	}
 	try:
 		return(d[number])
 	except KeyError:
 		return False
 
-def generate_data(count, limbo = []):
-	output = {}
-	gender = ['male', 'female']
-	for value in limbo:
-		if (lookup_table(value) == "license_plate"):
-			tmp = []
-			for _ in range(count):
-				tmp.append(dummy.license_plates())
-			output['license_plates'] = tmp
-		if (lookup_table(value) == "phone_number"):
-			tmp = []
-			for _ in range(count):
-				tmp.append(dummy.phone_number())
-			output['phone_number'] = tmp
-		if (lookup_table(value) == "full_name"):
-			tmp = []
-			for _ in range(count):
-				tmp.append(dummy.full_name(random.choice(gender)))
-			output['full_name'] = tmp
-		if (lookup_table(value) == "first_name"):
-			tmp = []
-			for _ in range(count):
-				tmp.append(dummy.first_name(random.choice(gender)))
-			output['first_name'] = tmp
-		if (lookup_table(value) == "last_name"):
-			tmp = []
-			for _ in range(count):
-				tmp.append(dummy.last_name())
-			output['last_name'] = tmp
-		if (lookup_table(value) == "email"):
-			tmp = []
-			for _ in range(count):
-				tmp.append(dummy.generate_email())
-			output['email'] = tmp
-		if (lookup_table(value) == "get_manufactorer"):
-			tmp = []
-			for _ in range(count):
-				tmp.append(dummy.get_manufactorers())
-			output['get_manufactorer'] = tmp
-		if (lookup_table(value) == "vehicle_model_year_api"):
-			tmp = []
-			for _ in range(count):
-				tmp.append(dummy.vehicle_model_year_api())
-			output['vehicle_model_year'] = tmp
-		if (lookup_table(value) == "vin_generator"):
-			tmp = []
-			for _ in range(count):
-				tmp.append(dummy.vin_generator())
-			output['vin_generator'] = tmp
-	return output
+# Commenting out the old method of single thread non-multiprocessing/threading since its deprecated
+# def generate_data(count, limbo = []):
+# 	output = {}
+# 	gender = ['male', 'female']
+# 	for value in limbo:
+# 		if (lookup_table(value) == "license_plate"):
+# 			tmp = []
+# 			for _ in range(count):
+# 				tmp.append(dummy.license_plates())
+# 			output['license_plates'] = tmp
+# 		if (lookup_table(value) == "phone_number"):
+# 			tmp = []
+# 			for _ in range(count):
+# 				tmp.append(dummy.phone_number())
+# 			output['phone_number'] = tmp
+# 		if (lookup_table(value) == "full_name"):
+# 			tmp = []
+# 			for _ in range(count):
+# 				tmp.append(dummy.full_name(random.choice(gender)))
+# 			output['full_name'] = tmp
+# 		if (lookup_table(value) == "first_name"):
+# 			tmp = []
+# 			for _ in range(count):
+# 				tmp.append(dummy.first_name(random.choice(gender)))
+# 			output['first_name'] = tmp
+# 		if (lookup_table(value) == "last_name"):
+# 			tmp = []
+# 			for _ in range(count):
+# 				tmp.append(dummy.last_name())
+# 			output['last_name'] = tmp
+# 		if (lookup_table(value) == "email"):
+# 			tmp = []
+# 			for _ in range(count):
+# 				tmp.append(dummy.generate_email())
+# 			output['email'] = tmp
+# 		if (lookup_table(value) == "get_manufactorer"):
+# 			tmp = []
+# 			for _ in range(count):
+# 				tmp.append(dummy.get_manufactorers())
+# 			output['get_manufactorer'] = tmp
+# 		if (lookup_table(value) == "vehicle_model_year_api"):
+# 			tmp = []
+# 			for _ in range(count):
+# 				tmp.append(dummy.vehicle_model_year_api())
+# 			output['vehicle_model_year'] = tmp
+# 		if (lookup_table(value) == "vin_generator"):
+# 			tmp = []
+# 			for _ in range(count):
+# 				tmp.append(dummy.vin_generator())
+# 			output['vin_generator'] = tmp
+# 		if (lookup_table(value) == "address"):
+# 			tmp = []
+# 			for _ in range(count):
+# 				tmp.append(dummy.faker_provider_address())
+# 			output['address'] = tmp
+# 		if (lookup_table(value) == "text"):
+# 			tmp = []
+# 			if (args.txtlen):
+# 				for _ in range(count):
+# 					tmp.append(dummy.faker_provider_text(args.txtlen))
+# 			else:
+# 				for _ in range(count):
+# 					tmp.append(dummy.faker_provider_text())
+# 			output['text'] = tmp
+# 	return output
 
 '''
  Refactored function of generate_date() to allow a more threading friendly function
@@ -114,6 +131,11 @@ def generate_data_threading(count, value):
 		for _ in range(count):
 			tmp.append(dummy.full_name(random.choice(gender)))
 		output['full_name'] = tmp
+	if (lookup_table(value) == "address"):
+		tmp = []
+		for _ in range(count):
+			tmp.append(dummy.faker_provider_address())
+		output['address'] = tmp
 	if (lookup_table(value) == "first_name"):
 		for _ in range(count):
 			tmp.append(dummy.first_name(random.choice(gender)))
@@ -138,6 +160,7 @@ def generate_data_threading(count, value):
 		for _ in range(count):
 			tmp.append(dummy.vin_generator())
 		output['vin_generator'] = tmp
+	return output
 
 if (__name__ == "__main__"):
 	parser = argparse.ArgumentParser(description="Arguments for PyDummy Data Generator", allow_abbrev=True)
@@ -155,10 +178,16 @@ if (__name__ == "__main__"):
 	parser.add_argument("--first-name", help="Generate a first name", default=False, action="store_true", dest="first")
 	parser.add_argument("--last-name", help="Generate a last name", default=False, action="store_true", dest="last")
 	parser.add_argument("--email", help="Generate an email", default=False, action="store_true", dest="email")
+	parser.add_argument("--address", help="Generate a random address", default=False, action="store_true", dest="address")
 	#parser.add_argument("--get-manufactorer", help="Generate a manufactorer", default=False, action="store_true", dest="manufactor")
-	#parser.add_argument("--vehicle-model-year", help="Generate a vehicle, model, and year", default=False, action="store_true", dest="vmy")
+	parser.add_argument("--vehicle-model-year", help="Generate a vehicle, model, and year", default=False, action="store_true", dest="vmy")
 	parser.add_argument("--vin-generator", help="Generate a random fake VIN", default=False, action="store_true", dest="vin")
+	parser.add_argument("--text", help="Generate random text", default=False, action="store_true", dest="txt")
+	parser.add_argument("--text-length", help="Length of random text", default=100, dest="txtlen", type=int)
 	args = parser.parse_args()
+
+	# start program
+	welcome()
 
 	# Handle arguments
 	count = args.count
@@ -178,11 +207,16 @@ if (__name__ == "__main__"):
 	# TODO: currently there is a bug with both these options, will fix later
 	#if (args.manufactor):
 		#limbo.append(6)
-	#if (args.vmy):
-		#limbo.append(7)
+	if (args.vmy):
+		limbo.append(7)
 	if (args.vin):
 		limbo.append(8)
+	if (args.address):
+		limbo.append(9)
+	if (args.txt):
+		limbo.append(10)
 
+	# Multi-threading to speed up generation
 	if (args.insert):
 		output = {}
 		threads = []

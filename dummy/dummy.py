@@ -6,8 +6,17 @@ import names
 import sqlite3
 import pymysql
 import configparser
-
+from faker import Faker
 from dummy.VinGenerator import vin
+
+# Faker Address
+def faker_provider_address():
+	fake = Faker()
+	return fake.address()
+
+def faker_provider_text(length=100):
+	fake = Faker()
+	return fake.text(length)
 
 # Fake license plate  generator
 def license_plates(size=6, chars=string.ascii_uppercase + string.digits):
@@ -66,29 +75,35 @@ def get_manufactorers(fileName="manufactorers.txt"):
 
 # Use a configuration file to retrieve vehicle model years randomly
 # Yes I know it's not actually an API, but I plan to eventually implement one for the MySQL database
-def vehicle_model_year_api(iniFile="../private/db.ini"):
+def vehicle_model_year_api(iniFile="private/db.ini"):
 	config = configparser.ConfigParser()
 	config.read(iniFile)
 	host=config['mysql']['host']
-	port=config['mysql']['port']
+	port=int(config['mysql']['port'])
 	user=config['mysql']['user']
 	passwd=config['mysql']['password']
 	db=config['mysql']['db']
-	vehicle_model_year(host, port, user, passwd, db)
+	connection = pymysql.connect(host=host, port=port, user=user, passwd=passwd, db=db, cursorclass=pymysql.cursors.DictCursor)
+	cursor = connection.cursor()
+	cursor.execute("SELECT MAX(id) FROM VehicleModelYear")
+	row = cursor.fetchone()
+	connection.commit()
+	maxId = row['MAX(id)']
+	vmy = vehicle_model_year(connection, cursor, maxId)
+	output = []
+	for item in vmy:
+		for key, value in item.items():
+			if (key != "id"):
+				output.append(value)
+	return (' '.join(str(v) for v in output))
 
-def vehicle_model_year(host, password, db, port=3306, user="root"):
-	connection = pymysql.connect(host=host, port=port, user=user, passwd=password, db=db, cursorclass=pymysql.cursors.DictCursor)
+def vehicle_model_year(connection, cursor, maxId):
 	try:
-		cursor = connection.cursor()
-		cursor.execute("SELECT MAX(id) FROM VehicleModelYear")
-		row = cursor.fetchone()
-		maxId = row['MAX(id)']
 		randIndex = random.randint(0, maxId)
-
 		getVMYQuery = "SELECT * FROM VehicleModelYear WHERE id={}".format(randIndex)
 		cursor.execute(getVMYQuery)
-		return (cursor.fetchone())
-
+		connection.commit()
+		return (cursor.fetchall())
 	except Exception as e:
 		print(e)
 		return 0

@@ -51,7 +51,7 @@ def sql_insert_query(table, columns=[], values=[]):
             c = 0
             while (c < numValues):
                 if ( c == (numValues-1)):
-                    insert += "`" + values[c][i] + "`"
+                    insert += "`" + str(values[c][i]) + "`"
                     break
                 insert += "`" + values[c][i] + "`, "
                 c += 1

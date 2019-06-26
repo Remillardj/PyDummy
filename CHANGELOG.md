@@ -1,4 +1,9 @@
 # Changelog
+# 0.1.0
+- Generate fake data:
+- addresses, full names, VIN's, vehicle/model/year, phone numbers, license plates, text, and emails
+- integrated Faker module
+
 # 0.0.4
 - Generating insert statements now uses threading
 

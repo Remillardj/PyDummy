@@ -15,6 +15,24 @@ Program uses multithreading, so it is slow to start but does speed up. Working o
 Start generating:
 `./main -h`
 
+# Benchmarks
+```
+[root@server0001 PyDummy]# time ./main.py -c 10000 -t test --license-plate --phone-number --full-name --email --address --vehicle-model-year --vin-generator --text --text-length 10000
+
+		____ ___  _ ____  _     _      _     ___  _   _____ _____ _      _____ ____  ____  _____  ____  ____
+		/  __\  \///  _ \/ \ /\/ \__/|/ \__/|\  \//  /  __//  __// \  /|/  __//  __\/  _ \/__ __\/  _ \/  __		|  \/| \  / | | \|| | ||| |\/||| |\/|| \  /   | |  _|  \  | |\ |||  \  |  \/|| / \|  / \  | / \||  \/|
+		|  __/ / /  | |_/|| \_/|| |  ||| |  || / /    | |_//|  /_ | | \|||  /_ |    /| |-||  | |  | \_/||    /
+		\_/   /_/   \____/\____/\_/  \|\_/  \|/_/     \____\____\_/  \|\____\_/\_\_/ \|  \_/  \____/\_/\_
+
+
+--- Starting PyDummy Data Generator! ---
+
+real	10m34.615s
+user	10m21.115s
+sys	1m20.371s
+```
+10k rows for 10minutes. Still really slow.
+
 # The INI File for VehicleModelYear module, insert the data from the db/ folder into a local MySQL server
 Currently it is hardcoded for sections, but the format needs to be like so:
 ~~~

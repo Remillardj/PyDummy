@@ -39,7 +39,7 @@ def getCheckSumChar(vin):
             checkSumTotal += int(vinDigitValues[vin[i]]) * vinDigitPositionMultiplier[i]
         else:
             #Characters not in the VinDigitValues list are not valid VIN characters - return false (invalid)
-            print ("Illegal Character: %s") % vin[i]
+            print ("Illegal Character: %s") % str(vin[i])
             return -1
 
     remain = checkSumTotal % 11

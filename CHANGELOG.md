@@ -1,4 +1,7 @@
 # Changelog
+# 0.1.1
+- VinGenerator module prints vin[i] item which is not a string
+
 # 0.1.0
 - Generate fake data:
 - addresses, full names, VIN's, vehicle/model/year, phone numbers, license plates, text, and emails
